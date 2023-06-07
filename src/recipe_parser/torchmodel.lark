@@ -1,0 +1,32 @@
+// torchmodel recipe
+start: (entry_def)*
+
+// entry definition
+entry_def: entry_name "use" STRING ( "where" binding+ "end")?
+
+!entry_name: "loss" | "optimizer" | "lr_scheduler" | "dataset" | "model" | "source" | "training"
+
+// bindings
+binding: key "=" value
+
+key: NAME
+
+?value: INT -> int
+      | FLOAT -> float
+      | STRING -> string
+      | LONG_STRING -> long_string
+      | "True" -> const_true
+      | "False" -> const_false
+
+// terminal
+NAME: /[^\W\d]\w*/
+STRING: /"(?!"").*?(?<!\\)(\\\\)*?"|'(?!'').*?(?<!\\)(\\\\)*?'/i
+LONG_STRING: /""".*?(?<!\\)(\\\\)*?"""|'''.*?(?<!\\)(\\\\)*?'''/is
+INT: "0" | "1".."9" ("0".."9")*
+FLOAT: INT _EXP | _DECFRAC _EXP?
+_DECFRAC: "." ("0".."9")+ | INT "." ("0".."9")*
+_EXP: ("e" | "E") ["+" | "-"] ("0".."9")+
+
+// ignore
+%ignore /[ \t\f\r\n]/+  // white space
+%ignore /#[^\n]*/  // comment
